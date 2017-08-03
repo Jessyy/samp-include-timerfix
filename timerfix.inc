@@ -96,7 +96,8 @@ static stock
 // Fix for y_timers
 #define _Timer_C(O@  _Timer_C(SetTimerEx
 
-stock SetTimerHook(const szFunctionName[], iInterval, {bool, _}:bRepeating, const szFormat[] = !"", {_, PlayerText3D, Text, Text3D, Menu, DB, DBResult, File, Float}:...) {
+stock SetTimerHook(const szFunctionName[], iInterval, {bool, _}:bRepeating, const szFormat[] = !"", {_, PlayerText3D, Text, Text3D, Menu, DB, DBResult, File, Float}:...)
+{
 	static
 		bool:s_bTimerTickTimerStarted = false
 	;
@@ -179,7 +180,8 @@ stock SetTimerHook(const szFunctionName[], iInterval, {bool, _}:bRepeating, cons
 	return iSlot;
 }
 
-stock KillTimerHook(iTimer) {
+stock KillTimerHook(iTimer)
+{
 	if (0 <= iTimer < sizeof(gs_Timers)) {
 		if (gs_Timers[iTimer][e_bIsUsed]) {
 			gs_Timers[iTimer][e_bIsUsed] = false;
@@ -203,13 +205,15 @@ stock KillTimerHook(iTimer) {
 #define SetTimerEx  SetTimerHook
 #define KillTimer   KillTimerHook
 
-stock KillThisTimer() {
+stock KillThisTimer()
+{
 	if (gs_iCurrentTimer != -1)
 		KillTimer(gs_iCurrentTimer);
 }
 
 forward TF::TimerTick();
-public TF::TimerTick() {
+public TF::TimerTick()
+{
 	new
 		iTick,
 		iFunc,
@@ -294,7 +298,8 @@ public TF::TimerTick() {
 	}
 }
 
-stock TF::PrintFunctionCall(i) {
+stock TF::PrintFunctionCall(i)
+{
 	format(TF::gs_szDebugBuffer, sizeof(TF::gs_szDebugBuffer), "(TimerFix) DEBUG: Calling: %s(", gs_Timers[i][e_szFunctionName]);
 	
 	for (new j = 0; j < gs_Timers[i][e_iNumArguments]; j++) {
@@ -315,7 +320,8 @@ stock TF::PrintFunctionCall(i) {
 	print(TF::gs_szDebugBuffer);
 }
 
-stock TF::GetPublicFunctionAddress(const szName[]) {
+stock TF::GetPublicFunctionAddress(const szName[])
+{
 	new
 		iIndex,
 		iTemp
