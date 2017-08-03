@@ -197,8 +197,9 @@ stock KillTimerHook(iTimer)
 
 stock KillThisTimer()
 {
-	if (gs_iCurrentTimer != -1)
+	if (gs_iCurrentTimer != -1) {
 		KillTimerHook(gs_iCurrentTimer);
+	}
 }
 
 forward TF::TimerTick();
