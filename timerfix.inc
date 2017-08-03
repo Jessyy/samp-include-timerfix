@@ -44,7 +44,7 @@ enum TF::e_TIMER {
 	bool:e_bIsUsed,
 	     e_iNumArguments,
 	     e_axArguments[TIMER_FIX_MAX_ARGUMENTS],
-#if TIMER_FIX_DEBUG
+#if TF_DEBUG
 	     e_aiArgumentTypes[TIMER_FIX_MAX_ARGUMENTS],
 #endif
 	     e_iFunctionAddress,
@@ -139,7 +139,7 @@ stock SetTimerHook(const szFunctionName[], iInterval, {bool, _}:bRepeating, cons
 	}
 	
 	new
-		#if TIMER_FIX_DEBUG
+		#if TF_DEBUG
 			bool:bFormatIsPacked = ispacked(szFormat),
 		#endif
 		iNumArgs = max(0, numargs() - 4)
@@ -168,7 +168,7 @@ stock SetTimerHook(const szFunctionName[], iInterval, {bool, _}:bRepeating, cons
 	for (new i = 0; i < iNumArgs; i++) {
 		gs_Timers[iSlot][e_axArguments][i] = getarg(4 + i);
 		
-		#if TIMER_FIX_DEBUG
+		#if TF_DEBUG
 			gs_Timers[iSlot][e_aiArgumentTypes][i] = bFormatIsPacked ? szFormat{i} : szFormat[i];
 		#endif
 	}
@@ -229,7 +229,7 @@ public TF::TimerTick()
 			if (gs_Timers[i][e_bIsRepeating])
 				gs_Timers[i][e_iNextCall] = iTick + gs_Timers[i][e_iInterval] - 1;
 			
-			#if TIMER_FIX_DEBUG
+			#if TF_DEBUG
 				TF::PrintFunctionCall(i);
 			#endif
 			
