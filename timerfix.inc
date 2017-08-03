@@ -226,8 +226,9 @@ public TF::TimerTick()
 			iFunc = gs_Timers[i][e_iFunctionAddress];
 			
 			// This is done before and after execution, in case execution fails
-			if (gs_Timers[i][e_bIsRepeating])
+			if (gs_Timers[i][e_bIsRepeating]) {
 				gs_Timers[i][e_iNextCall] = iTick + gs_Timers[i][e_iInterval] - 1;
+			}
 			
 			#if TF_DEBUG
 				TF::PrintFunctionCall(i);
