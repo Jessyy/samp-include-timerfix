@@ -142,7 +142,7 @@ stock SetTimerHook(const szFunctionName[], iInterval, {bool, _}:bRepeating, cons
 		#if TIMER_FIX_DEBUG
 			bool:bFormatIsPacked = ispacked(szFormat),
 		#endif
-			     iNumArgs = max(0, numargs() - 4)
+		iNumArgs = max(0, numargs() - 4)
 	;
 	
 	if (iNumArgs != strlen(szFormat)) {
@@ -218,8 +218,9 @@ public TF::TimerTick()
 	}
 	
 	for (i = 0; i < sizeof(gs_Timers); i++) {
-		if (!gs_Timers[i][e_bIsUsed])
+		if (!gs_Timers[i][e_bIsUsed]) {
 			continue;
+		}
 		
 		if ((iTick = GetTickCount()) >= gs_Timers[i][e_iNextCall]) {
 			iFunc = gs_Timers[i][e_iFunctionAddress];
