@@ -121,7 +121,7 @@ stock SetTimerHook(const szFunctionName[], iInterval, {bool, _}:bRepeating, cons
 	}
 	
 	if (iSlot == -1) {
-		print(!"(TimerFix) ERROR: Ran out of timer slots. Increase TIMER_FIX_TIMER_SLOTS (current value: " #TIMER_FIX_TIMER_SLOTS ").");
+		DB::Error("(SetTimerHook) Ran out of timer slots. Increase TIMER_FIX_TIMER_SLOTS (current value: " #TIMER_FIX_TIMER_SLOTS ").");
 		
 		return -1;
 	}
@@ -133,7 +133,7 @@ stock SetTimerHook(const szFunctionName[], iInterval, {bool, _}:bRepeating, cons
 		
 		strunpack(szFunctionNameUnpacked, szFunctionName);
 		
-		printf("(TimerFix) ERROR: Invalid function (\"%s\").", szFunctionNameUnpacked);
+		DB::Errorf("(SetTimerHook) Invalid function (\"%s\").", szFunctionNameUnpacked);
 		
 		return -1;
 	}
@@ -152,7 +152,7 @@ stock SetTimerHook(const szFunctionName[], iInterval, {bool, _}:bRepeating, cons
 		
 		strunpack(szFormatUnpacked, szFormat);
 		
-		printf("(TimerFix) ERROR: The number of arguments (%d) doesn't match the number of arguments in the format specifier (\"%s\").", iNumArgs, szFormatUnpacked);
+		DB::Errorf("(SetTimerHook) The number of arguments (%d) doesn't match the number of arguments in the format specifier (\"%s\").", iNumArgs, szFormatUnpacked);
 		
 		return -1;
 	}
@@ -173,9 +173,7 @@ stock SetTimerHook(const szFunctionName[], iInterval, {bool, _}:bRepeating, cons
 		#endif
 	}
 	
-	#if TIMER_FIX_DEBUG
-		printf("(TimerFix) DEBUG: Timer created; %d = \"%s\".", iSlot, gs_Timers[iSlot][e_szFunctionName]);
-	#endif
+	DB::Debug("(SetTimerHook) Timer created; %d = \"%s\".", iSlot, gs_Timers[iSlot][e_szFunctionName]);
 	
 	return iSlot;
 }
@@ -186,17 +184,13 @@ stock KillTimerHook(iTimer)
 		if (gs_Timers[iTimer][e_bIsUsed]) {
 			gs_Timers[iTimer][e_bIsUsed] = false;
 			
-			#if TIMER_FIX_DEBUG
-				printf("(TimerFix) DEBUG: Killed timer %d (\"%s\").", iTimer, gs_Timers[iTimer][e_szFunctionName]);
-			#endif
+			DB::Debug("(KillTimerHook) Killed timer %d (\"%s\").", iTimer, gs_Timers[iTimer][e_szFunctionName]);
 			
 			return true;
 		}
 	}
 	
-	#if TIMER_FIX_DEBUG
-		printf("(TimerFix) DEBUG: Failed to kill timer %d; not in use / invalid id.", iTimer);
-	#endif
+	DB::Debug("(KillTimerHook) Failed to kill timer %d; not in use / invalid id.", iTimer);
 	
 	return false;
 }
@@ -218,7 +212,7 @@ public TF::TimerTick()
 	;
 	
 	if (gs_iCurrentTimer != -1) {
-		printf("(TimerFix) ERROR: The function \"%s\" didn't properly execute, some timers might not have been called.", gs_Timers[gs_iCurrentTimer][e_szFunctionName]);
+		DB::Errorf("(TF::TimerTick) The function \"%s\" didn't properly execute, some timers might not have been called.", gs_Timers[gs_iCurrentTimer][e_szFunctionName]);
 		
 		gs_iCurrentTimer = -1;
 	}
@@ -275,7 +269,7 @@ public TF::TimerTick()
 			
 			#if TIMER_FIX_PERFORMANCE_CHECKS
 				if (GetTickCount() - iTick > 10) {
-					printf("(TimerFix) WARNING: The function \"%s\" took %dms to execute! This will affect other timers.", gs_Timers[i][e_szFunctionName], GetTickCount() - iTick);
+					TF::Warningf("(TF::TimerTick) The function \"%s\" took %dms to execute! This will affect other timers.", gs_Timers[i][e_szFunctionName], GetTickCount() - iTick);
 				}
 			#endif
 			
@@ -284,9 +278,7 @@ public TF::TimerTick()
 			else {
 				gs_Timers[i][e_bIsUsed] = false;
 				
-				#if TIMER_FIX_DEBUG
-					printf("(TimerFix) DEBUG: Timer %d (\"%s\") finished.", i, gs_Timers[i][e_szFunctionName]);
-				#endif
+				DB::Debug("(TF::TimerTick) Timer %d (\"%s\") finished.", i, gs_Timers[i][e_szFunctionName]);
 			}
 			
 			gs_iCurrentTimer = -1;
