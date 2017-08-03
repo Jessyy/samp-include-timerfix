@@ -273,8 +273,9 @@ public TF::TimerTick()
 				}
 			#endif
 			
-			if (gs_Timers[i][e_bIsRepeating])
+			if (gs_Timers[i][e_bIsRepeating]) {
 				gs_Timers[i][e_iNextCall] = GetTickCount() + gs_Timers[i][e_iInterval] - 1;
+			}
 			else {
 				gs_Timers[i][e_bIsUsed] = false;
 				
@@ -291,15 +292,18 @@ stock TF::PrintFunctionCall(i)
 	format(TF::gs_szDebugBuffer, sizeof(TF::gs_szDebugBuffer), "(TimerFix) DEBUG: Calling: %s(", gs_Timers[i][e_szFunctionName]);
 	
 	for (new j = 0; j < gs_Timers[i][e_iNumArguments]; j++) {
-		if (j)
+		if (j) {
 			strcat(TF::gs_szDebugBuffer, ", ");
+		}
 		
 		switch (gs_Timers[i][e_aiArgumentTypes][j]) {
-			case 'f', 'F':
+			case 'f', 'F': {
 				format(TF::gs_szDebugBuffer, sizeof(TF::gs_szDebugBuffer), "%s%.2f", TF::gs_szDebugBuffer, gs_Timers[i][e_axArguments][j]);
+			}
 			
-			default:
+			default: {
 				format(TF::gs_szDebugBuffer, sizeof(TF::gs_szDebugBuffer), "%s%d", TF::gs_szDebugBuffer, gs_Timers[i][e_axArguments][j]);
+			}
 		}
 	}
 	
