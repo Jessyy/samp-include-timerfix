@@ -10,7 +10,7 @@
 */
 
 #if !defined _samp_included
-	#error Please include a_samp before Timer Fix.
+	#error Please include a_samp before timerfix.
 #endif
 
 #if !defined TIMER_FIX_TICK_INTERVAL
@@ -29,10 +29,15 @@
 	#define TIMER_FIX_PERFORMANCE_CHECKS  true
 #endif
 
-#if !defined TIMER_FIX_DEBUG
-	#define TIMER_FIX_DEBUG  false
+#if !defined TF_DEBUG
+	#define TF_DEBUG  false
 #endif
 
+#if !defined TF_LOG_TO_CHAT
+	#define TF_LOG_TO_CHAT  false
+#endif
+
+// "Namespace"
 #define TF::  TF_
 
 enum TF::e_TIMER {
@@ -49,13 +54,44 @@ enum TF::e_TIMER {
 	bool:e_bIsRepeating
 };
 
-static
-#if TIMER_FIX_DEBUG
-	TF::gs_szDebugBuffer[512],
-#endif
-	TF::gs_Timers[TIMER_FIX_TIMER_SLOTS][TF::e_TIMER],
-	TF::gs_iCurrentTimer = -1
+static stock
+	gs_Timers[TIMER_FIX_TIMER_SLOTS][TF::e_TIMER],
+	gs_iCurrentTimer = -1
 ;
+
+#if !TF_DEBUG
+	#define TF_Debug(%1)%0;
+#endif
+
+#if !TF_LOG_TO_CHAT
+	#define TF_Notice(%1)       print(!"Timerfix Notice: "  %1)
+	#define TF_Warning(%1)      print(!"Timerfix Warning: " %1)
+	#define TF_Error(%1)        print(!"Timerfix Error: "   %1)
+	
+	#define TF_Noticef(%1)      printf("Timerfix Notice: "  %1)
+	#define TF_Warningf(%1)     printf("Timerfix Warning: " %1)
+	#define TF_Errorf(%1)       printf("Timerfix Error: "   %1)
+	
+	#if TF_DEBUG
+		#define TF_Debug(%1)    printf("Timerfix Debug: "   %1)
+	#endif
+#else
+	new
+		TF::gs_szLogMessageBuffer[512],
+	;
+	
+	#define TF_Notice(%1)       print(!"Timerfix Notice: "  %1), SendClientMessageToAll(0xFFFFFFFF, "Timerfix Notice: "  %1)
+	#define TF_Warning(%1)      print(!"Timerfix Warning: " %1), SendClientMessageToAll(0xEBBD17FF, "Timerfix Warning: " %1)
+	#define TF_Error(%1)        print(!"Timerfix Error: "   %1), SendClientMessageToAll(0xCC0000FF, "Timerfix Error: "   %1)
+
+	#define TF_Noticef(%1)      format(TF::gs_szLogMessageBuffer, sizeof(TF::gs_szLogMessageBuffer), "Timerfix Notice: "  %1), print(TF::gs_szLogMessageBuffer), SendClientMessageToAll(0xDDDDDDFF, TF::gs_szLogMessageBuffer)
+	#define TF_Warningf(%1)     format(TF::gs_szLogMessageBuffer, sizeof(TF::gs_szLogMessageBuffer), "Timerfix Warning: " %1), print(TF::gs_szLogMessageBuffer), SendClientMessageToAll(0xEBBD17FF, TF::gs_szLogMessageBuffer)
+	#define TF_Errorf(%1)       format(TF::gs_szLogMessageBuffer, sizeof(TF::gs_szLogMessageBuffer), "Timerfix Error: "   %1), print(TF::gs_szLogMessageBuffer), SendClientMessageToAll(0xCC0000FF, TF::gs_szLogMessageBuffer)
+	
+	#if TF_DEBUG
+		#define TF_Debug(%1)    format(TF::gs_szLogMessageBuffer, sizeof(TF::gs_szLogMessageBuffer), "Timerfix Debug: "   %1), print(TF::gs_szLogMessageBuffer), SendClientMessageToAll(0xFFFFFFFF, TF::gs_szLogMessageBuffer)
+	#endif
+#endif
 
 // Fix for y_timers
 #define _Timer_C(O@  _Timer_C(SetTimerEx
@@ -75,8 +111,8 @@ stock SetTimerHook(const szFunctionName[], iInterval, {bool, _}:bRepeating, cons
 		iSlot = -1
 	;
 	
-	for (new i = 0; i < sizeof(TF::gs_Timers); i++) {
-		if (!TF::gs_Timers[i][e_bIsUsed]) {
+	for (new i = 0; i < sizeof(gs_Timers); i++) {
+		if (!gs_Timers[i][e_bIsUsed]) {
 			iSlot = i;
 			
 			break;
@@ -89,7 +125,7 @@ stock SetTimerHook(const szFunctionName[], iInterval, {bool, _}:bRepeating, cons
 		return -1;
 	}
 	
-	if (!(TF::gs_Timers[iSlot][e_iFunctionAddress] = TF::GetPublicFunctionAddress(szFunctionName))) {
+	if (!(gs_Timers[iSlot][e_iFunctionAddress] = TF::GetPublicFunctionAddress(szFunctionName))) {
 		new
 			szFunctionNameUnpacked[32]
 		;
@@ -120,36 +156,36 @@ stock SetTimerHook(const szFunctionName[], iInterval, {bool, _}:bRepeating, cons
 		return -1;
 	}
 	
-	TF::gs_Timers[iSlot][e_bIsUsed]       = true;
-	TF::gs_Timers[iSlot][e_bIsRepeating]  = bRepeating;
-	TF::gs_Timers[iSlot][e_iInterval]     = iInterval;
-	TF::gs_Timers[iSlot][e_iNextCall]     = GetTickCount() + iInterval;
-	TF::gs_Timers[iSlot][e_iNumArguments] = iNumArgs;
+	gs_Timers[iSlot][e_bIsUsed]       = true;
+	gs_Timers[iSlot][e_bIsRepeating]  = bRepeating;
+	gs_Timers[iSlot][e_iInterval]     = iInterval;
+	gs_Timers[iSlot][e_iNextCall]     = GetTickCount() + iInterval;
+	gs_Timers[iSlot][e_iNumArguments] = iNumArgs;
 	
-	strunpack(TF::gs_Timers[iSlot][e_szFunctionName], szFunctionName, 32);
+	strunpack(gs_Timers[iSlot][e_szFunctionName], szFunctionName, 32);
 	
 	for (new i = 0; i < iNumArgs; i++) {
-		TF::gs_Timers[iSlot][e_axArguments][i] = getarg(4 + i);
+		gs_Timers[iSlot][e_axArguments][i] = getarg(4 + i);
 		
 		#if TIMER_FIX_DEBUG
-			TF::gs_Timers[iSlot][e_aiArgumentTypes][i] = bFormatIsPacked ? szFormat{i} : szFormat[i];
+			gs_Timers[iSlot][e_aiArgumentTypes][i] = bFormatIsPacked ? szFormat{i} : szFormat[i];
 		#endif
 	}
 	
 	#if TIMER_FIX_DEBUG
-		printf("(TimerFix) DEBUG: Timer created; %d = \"%s\".", iSlot, TF::gs_Timers[iSlot][e_szFunctionName]);
+		printf("(TimerFix) DEBUG: Timer created; %d = \"%s\".", iSlot, gs_Timers[iSlot][e_szFunctionName]);
 	#endif
 	
 	return iSlot;
 }
 
 stock KillTimerHook(iTimer) {
-	if (0 <= iTimer < sizeof(TF::gs_Timers)) {
-		if (TF::gs_Timers[iTimer][e_bIsUsed]) {
-			TF::gs_Timers[iTimer][e_bIsUsed] = false;
+	if (0 <= iTimer < sizeof(gs_Timers)) {
+		if (gs_Timers[iTimer][e_bIsUsed]) {
+			gs_Timers[iTimer][e_bIsUsed] = false;
 			
 			#if TIMER_FIX_DEBUG
-				printf("(TimerFix) DEBUG: Killed timer %d (\"%s\").", iTimer, TF::gs_Timers[iTimer][e_szFunctionName]);
+				printf("(TimerFix) DEBUG: Killed timer %d (\"%s\").", iTimer, gs_Timers[iTimer][e_szFunctionName]);
 			#endif
 			
 			return true;
@@ -168,8 +204,8 @@ stock KillTimerHook(iTimer) {
 #define KillTimer   KillTimerHook
 
 stock KillThisTimer() {
-	if (TF::gs_iCurrentTimer != -1)
-		KillTimer(TF::gs_iCurrentTimer);
+	if (gs_iCurrentTimer != -1)
+		KillTimer(gs_iCurrentTimer);
 }
 
 forward TF::TimerTick();
@@ -181,31 +217,31 @@ public TF::TimerTick() {
 		i, j
 	;
 	
-	if (TF::gs_iCurrentTimer != -1) {
-		printf("(TimerFix) ERROR: The function \"%s\" didn't properly execute, some timers might not have been called.", TF::gs_Timers[TF::gs_iCurrentTimer][e_szFunctionName]);
+	if (gs_iCurrentTimer != -1) {
+		printf("(TimerFix) ERROR: The function \"%s\" didn't properly execute, some timers might not have been called.", gs_Timers[gs_iCurrentTimer][e_szFunctionName]);
 		
-		TF::gs_iCurrentTimer = -1;
+		gs_iCurrentTimer = -1;
 	}
 	
-	for (i = 0; i < sizeof(TF::gs_Timers); i++) {
-		if (!TF::gs_Timers[i][e_bIsUsed])
+	for (i = 0; i < sizeof(gs_Timers); i++) {
+		if (!gs_Timers[i][e_bIsUsed])
 			continue;
 		
-		if ((iTick = GetTickCount()) >= TF::gs_Timers[i][e_iNextCall]) {
-			iFunc = TF::gs_Timers[i][e_iFunctionAddress];
+		if ((iTick = GetTickCount()) >= gs_Timers[i][e_iNextCall]) {
+			iFunc = gs_Timers[i][e_iFunctionAddress];
 			
 			// This is done before and after execution, in case execution fails
-			if (TF::gs_Timers[i][e_bIsRepeating])
-				TF::gs_Timers[i][e_iNextCall] = iTick + TF::gs_Timers[i][e_iInterval] - 1;
+			if (gs_Timers[i][e_bIsRepeating])
+				gs_Timers[i][e_iNextCall] = iTick + gs_Timers[i][e_iInterval] - 1;
 			
 			#if TIMER_FIX_DEBUG
 				TF::PrintFunctionCall(i);
 			#endif
 			
-			j = TF::gs_Timers[i][e_iNumArguments];
+			j = gs_Timers[i][e_iNumArguments];
 			
 			
-			TF::gs_iCurrentTimer = i;
+			gs_iCurrentTimer = i;
 			
 			// Push the arguments
 			while (--j >= 0) {
@@ -224,7 +260,7 @@ public TF::TimerTick() {
 			}
 			
 			// Push the number of arguments
-			iArg = TF::gs_Timers[i][e_iNumArguments] * 4;
+			iArg = gs_Timers[i][e_iNumArguments] * 4;
 			
 			#emit PUSH.S      iArg
 
@@ -239,38 +275,38 @@ public TF::TimerTick() {
 			
 			#if TIMER_FIX_PERFORMANCE_CHECKS
 				if (GetTickCount() - iTick > 10) {
-					printf("(TimerFix) WARNING: The function \"%s\" took %dms to execute! This will affect other timers.", TF::gs_Timers[i][e_szFunctionName], GetTickCount() - iTick);
+					printf("(TimerFix) WARNING: The function \"%s\" took %dms to execute! This will affect other timers.", gs_Timers[i][e_szFunctionName], GetTickCount() - iTick);
 				}
 			#endif
 			
-			if (TF::gs_Timers[i][e_bIsRepeating])
-				TF::gs_Timers[i][e_iNextCall] = GetTickCount() + TF::gs_Timers[i][e_iInterval] - 1;
+			if (gs_Timers[i][e_bIsRepeating])
+				gs_Timers[i][e_iNextCall] = GetTickCount() + gs_Timers[i][e_iInterval] - 1;
 			else {
-				TF::gs_Timers[i][e_bIsUsed] = false;
+				gs_Timers[i][e_bIsUsed] = false;
 				
 				#if TIMER_FIX_DEBUG
-					printf("(TimerFix) DEBUG: Timer %d (\"%s\") finished.", i, TF::gs_Timers[i][e_szFunctionName]);
+					printf("(TimerFix) DEBUG: Timer %d (\"%s\") finished.", i, gs_Timers[i][e_szFunctionName]);
 				#endif
 			}
 			
-			TF::gs_iCurrentTimer = -1;
+			gs_iCurrentTimer = -1;
 		}
 	}
 }
 
 stock TF::PrintFunctionCall(i) {
-	format(TF::gs_szDebugBuffer, sizeof(TF::gs_szDebugBuffer), "(TimerFix) DEBUG: Calling: %s(", TF::gs_Timers[i][e_szFunctionName]);
+	format(TF::gs_szDebugBuffer, sizeof(TF::gs_szDebugBuffer), "(TimerFix) DEBUG: Calling: %s(", gs_Timers[i][e_szFunctionName]);
 	
-	for (new j = 0; j < TF::gs_Timers[i][e_iNumArguments]; j++) {
+	for (new j = 0; j < gs_Timers[i][e_iNumArguments]; j++) {
 		if (j)
 			strcat(TF::gs_szDebugBuffer, ", ");
 		
-		switch (TF::gs_Timers[i][e_aiArgumentTypes][j]) {
+		switch (gs_Timers[i][e_aiArgumentTypes][j]) {
 			case 'f', 'F':
-				format(TF::gs_szDebugBuffer, sizeof(TF::gs_szDebugBuffer), "%s%.2f", TF::gs_szDebugBuffer, TF::gs_Timers[i][e_axArguments][j]);
+				format(TF::gs_szDebugBuffer, sizeof(TF::gs_szDebugBuffer), "%s%.2f", TF::gs_szDebugBuffer, gs_Timers[i][e_axArguments][j]);
 			
 			default:
-				format(TF::gs_szDebugBuffer, sizeof(TF::gs_szDebugBuffer), "%s%d", TF::gs_szDebugBuffer, TF::gs_Timers[i][e_axArguments][j]);
+				format(TF::gs_szDebugBuffer, sizeof(TF::gs_szDebugBuffer), "%s%d", TF::gs_szDebugBuffer, gs_Timers[i][e_axArguments][j]);
 		}
 	}
 	
