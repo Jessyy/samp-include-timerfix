@@ -121,7 +121,7 @@ stock SetTimerHook(const szFunctionName[], iInterval, {bool, _}:bRepeating, cons
 	}
 	
 	if (iSlot == -1) {
-		DB::Error("(SetTimerHook) Ran out of timer slots. Increase TIMER_FIX_TIMER_SLOTS (current value: " #TIMER_FIX_TIMER_SLOTS ").");
+		TF::Error("(SetTimerHook) Ran out of timer slots. Increase TIMER_FIX_TIMER_SLOTS (current value: " #TIMER_FIX_TIMER_SLOTS ").");
 		
 		return -1;
 	}
@@ -133,7 +133,7 @@ stock SetTimerHook(const szFunctionName[], iInterval, {bool, _}:bRepeating, cons
 		
 		strunpack(szFunctionNameUnpacked, szFunctionName);
 		
-		DB::Errorf("(SetTimerHook) Invalid function (\"%s\").", szFunctionNameUnpacked);
+		TF::Errorf("(SetTimerHook) Invalid function (\"%s\").", szFunctionNameUnpacked);
 		
 		return -1;
 	}
@@ -152,7 +152,7 @@ stock SetTimerHook(const szFunctionName[], iInterval, {bool, _}:bRepeating, cons
 		
 		strunpack(szFormatUnpacked, szFormat);
 		
-		DB::Errorf("(SetTimerHook) The number of arguments (%d) doesn't match the number of arguments in the format specifier (\"%s\").", iNumArgs, szFormatUnpacked);
+		TF::Errorf("(SetTimerHook) The number of arguments (%d) doesn't match the number of arguments in the format specifier (\"%s\").", iNumArgs, szFormatUnpacked);
 		
 		return -1;
 	}
@@ -173,7 +173,7 @@ stock SetTimerHook(const szFunctionName[], iInterval, {bool, _}:bRepeating, cons
 		#endif
 	}
 	
-	DB::Debug("(SetTimerHook) Timer created; %d = \"%s\".", iSlot, gs_Timers[iSlot][e_szFunctionName]);
+	TF::Debug("(SetTimerHook) Timer created; %d = \"%s\".", iSlot, gs_Timers[iSlot][e_szFunctionName]);
 	
 	return iSlot;
 }
@@ -184,13 +184,13 @@ stock KillTimerHook(iTimer)
 		if (gs_Timers[iTimer][e_bIsUsed]) {
 			gs_Timers[iTimer][e_bIsUsed] = false;
 			
-			DB::Debug("(KillTimerHook) Killed timer %d (\"%s\").", iTimer, gs_Timers[iTimer][e_szFunctionName]);
+			TF::Debug("(KillTimerHook) Killed timer %d (\"%s\").", iTimer, gs_Timers[iTimer][e_szFunctionName]);
 			
 			return true;
 		}
 	}
 	
-	DB::Debug("(KillTimerHook) Failed to kill timer %d; not in use / invalid id.", iTimer);
+	TF::Debug("(KillTimerHook) Failed to kill timer %d; not in use / invalid id.", iTimer);
 	
 	return false;
 }
@@ -212,7 +212,7 @@ public TF::TimerTick()
 	;
 	
 	if (gs_iCurrentTimer != -1) {
-		DB::Errorf("(TF::TimerTick) The function \"%s\" didn't properly execute, some timers might not have been called.", gs_Timers[gs_iCurrentTimer][e_szFunctionName]);
+		TF::Errorf("(TF::TimerTick) The function \"%s\" didn't properly execute, some timers might not have been called.", gs_Timers[gs_iCurrentTimer][e_szFunctionName]);
 		
 		gs_iCurrentTimer = -1;
 	}
@@ -278,7 +278,7 @@ public TF::TimerTick()
 			else {
 				gs_Timers[i][e_bIsUsed] = false;
 				
-				DB::Debug("(TF::TimerTick) Timer %d (\"%s\") finished.", i, gs_Timers[i][e_szFunctionName]);
+				TF::Debug("(TF::TimerTick) Timer %d (\"%s\") finished.", i, gs_Timers[i][e_szFunctionName]);
 			}
 			
 			gs_iCurrentTimer = -1;
