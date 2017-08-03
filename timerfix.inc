@@ -1,4 +1,13 @@
-// TimerFix v2 beta by Slice
+/*
+	Timerfix v2.0 by Slice
+
+	Changelog:
+			2012-02-13:
+				* Improved stability for the beta 2.
+
+			2012-02-12:
+				* Initial release.
+*/
 
 #if !defined _samp_included
 	#error Please include a_samp before Timer Fix.
