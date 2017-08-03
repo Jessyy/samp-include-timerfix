@@ -201,14 +201,10 @@ stock KillTimerHook(iTimer)
 	return false;
 }
 
-#define SetTimer    SetTimerHook
-#define SetTimerEx  SetTimerHook
-#define KillTimer   KillTimerHook
-
 stock KillThisTimer()
 {
 	if (gs_iCurrentTimer != -1)
-		KillTimer(gs_iCurrentTimer);
+		KillTimerHook(gs_iCurrentTimer);
 }
 
 forward TF::TimerTick();
@@ -370,3 +366,8 @@ stock TF::GetPublicFunctionAddress(const szName[])
 	
 	return 0;
 }
+
+// This is done lastly because the fixed function isn't needed within Timerfix
+#define SetTimer    SetTimerHook
+#define SetTimerEx  SetTimerHook
+#define KillTimer   KillTimerHook
