@@ -13,20 +13,20 @@
 	#error Please include a_samp before timerfix.
 #endif
 
-#if !defined TIMER_FIX_TICK_INTERVAL
-	#define TIMER_FIX_TICK_INTERVAL  5
+#if !defined TF_TICK_INTERVAL
+	#define TF_TICK_INTERVAL  5
 #endif
 
-#if !defined TIMER_FIX_TIMER_SLOTS
-	#define TIMER_FIX_TIMER_SLOTS  128
+#if !defined TF_MAX_SLOTS
+	#define TF_MAX_SLOTS  128
 #endif
 
-#if !defined TIMER_FIX_MAX_ARGUMENTS
-	#define TIMER_FIX_MAX_ARGUMENTS  32
+#if !defined TF_MAX_ARGUMENTS
+	#define TF_MAX_ARGUMENTS  32
 #endif
 
-#if !defined TIMER_FIX_PERFORMANCE_CHECKS
-	#define TIMER_FIX_PERFORMANCE_CHECKS  true
+#if !defined TF_PERFORMANCE_CHECKS
+	#define TF_PERFORMANCE_CHECKS  true
 #endif
 
 #if !defined TF_DEBUG
@@ -43,9 +43,9 @@
 enum TF::e_TIMER {
 	bool:e_bIsUsed,
 	     e_iNumArguments,
-	     e_axArguments[TIMER_FIX_MAX_ARGUMENTS],
+	     e_axArguments[TF_MAX_ARGUMENTS],
 #if TF_DEBUG
-	     e_aiArgumentTypes[TIMER_FIX_MAX_ARGUMENTS],
+	     e_aiArgumentTypes[TF_MAX_ARGUMENTS],
 #endif
 	     e_iFunctionAddress,
 	     e_szFunctionName[32],
@@ -55,7 +55,7 @@ enum TF::e_TIMER {
 };
 
 static stock
-	gs_Timers[TIMER_FIX_TIMER_SLOTS][TF::e_TIMER],
+	gs_Timers[TF_MAX_SLOTS][TF::e_TIMER],
 	gs_iCurrentTimer = -1
 ;
 
@@ -103,7 +103,7 @@ stock SetTimerHook(const szFunctionName[], iInterval, {bool, _}:bRepeating, cons
 	;
 	
 	if (!s_bTimerTickTimerStarted) {
-		SetTimer(!"TF_TimerTick", TIMER_FIX_TICK_INTERVAL, true);
+		SetTimer(!"TF_TimerTick", TF_TICK_INTERVAL, true);
 		
 		s_bTimerTickTimerStarted = true;
 	}
@@ -121,7 +121,7 @@ stock SetTimerHook(const szFunctionName[], iInterval, {bool, _}:bRepeating, cons
 	}
 	
 	if (iSlot == -1) {
-		TF::Error("(SetTimerHook) Ran out of timer slots. Increase TIMER_FIX_TIMER_SLOTS (current value: " #TIMER_FIX_TIMER_SLOTS ").");
+		TF::Error("(SetTimerHook) Ran out of timer slots. Increase TF_MAX_SLOTS (current value: " #TF_MAX_SLOTS ").");
 		
 		return -1;
 	}
@@ -268,7 +268,7 @@ public TF::TimerTick()
 			#emit LOAD.S.pri  iFunc
 			#emit SCTRL		  6
 			
-			#if TIMER_FIX_PERFORMANCE_CHECKS
+			#if TF_PERFORMANCE_CHECKS
 				if (GetTickCount() - iTick > 10) {
 					TF::Warningf("(TF::TimerTick) The function \"%s\" took %dms to execute! This will affect other timers.", gs_Timers[i][e_szFunctionName], GetTickCount() - iTick);
 				}
