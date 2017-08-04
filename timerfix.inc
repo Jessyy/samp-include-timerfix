@@ -272,7 +272,7 @@ public TF::TimerTick()
 			
 			#if TF_PERFORMANCE_CHECKS
 				if (GetTickCount() - iTick > 10) {
-					TF::Warningf("(TF::TimerTick) The function \"%s\" took %dms to execute! This will affect other timers.", gs_Timers[i][e_szFunctionName], GetTickCount() - iTick);
+					TF::Warningf("(TF::TimerTick) High CPU usage in timer \"%s\", took %i ms to execute! This will affect other timers.", gs_Timers[i][e_szFunctionName], GetTickCount() - iTick);
 				}
 			#endif
 			
