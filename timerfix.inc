@@ -344,7 +344,7 @@ stock TF::GetPublicFunctionAddress(const szName[])
 #if TF_DEBUG
 	stock TF::PrintFunctionCall(i)
 	{
-		format(TF::gs_szLogMessageBuffer, sizeof(TF::gs_szLogMessageBuffer), "(TimerFix) DEBUG: Calling: %s(", gs_Timers[i][e_szFunctionName]);
+		format(TF::gs_szLogMessageBuffer, sizeof(TF::gs_szLogMessageBuffer), "Timerfix Debug: (TF::GetPublicFunctionAddress) Calling: \"%s\"(", gs_Timers[i][e_szFunctionName]);
 		
 		for (new j = 0; j < gs_Timers[i][e_iNumArguments]; j++) {
 			if (j) {
