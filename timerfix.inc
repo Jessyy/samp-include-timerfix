@@ -293,27 +293,27 @@ public TF::TimerTick()
 #if TF_DEBUG
 	stock TF::PrintFunctionCall(i)
 	{
-		format(TF::gs_szDebugBuffer, sizeof(TF::gs_szDebugBuffer), "(TimerFix) DEBUG: Calling: %s(", gs_Timers[i][e_szFunctionName]);
+		format(TF::gs_szLogMessageBuffer, sizeof(TF::gs_szLogMessageBuffer), "(TimerFix) DEBUG: Calling: %s(", gs_Timers[i][e_szFunctionName]);
 		
 		for (new j = 0; j < gs_Timers[i][e_iNumArguments]; j++) {
 			if (j) {
-				strcat(TF::gs_szDebugBuffer, ", ");
+				strcat(TF::gs_szLogMessageBuffer, ", ");
 			}
 			
 			switch (gs_Timers[i][e_aiArgumentTypes][j]) {
 				case 'f', 'F': {
-					format(TF::gs_szDebugBuffer, sizeof(TF::gs_szDebugBuffer), "%s%.2f", TF::gs_szDebugBuffer, gs_Timers[i][e_axArguments][j]);
+					format(TF::gs_szLogMessageBuffer, sizeof(TF::gs_szLogMessageBuffer), "%s%.2f", TF::gs_szLogMessageBuffer, gs_Timers[i][e_axArguments][j]);
 				}
 				
 				default: {
-					format(TF::gs_szDebugBuffer, sizeof(TF::gs_szDebugBuffer), "%s%d", TF::gs_szDebugBuffer, gs_Timers[i][e_axArguments][j]);
+					format(TF::gs_szLogMessageBuffer, sizeof(TF::gs_szLogMessageBuffer), "%s%d", TF::gs_szLogMessageBuffer, gs_Timers[i][e_axArguments][j]);
 				}
 			}
 		}
 		
-		strcat(TF::gs_szDebugBuffer, ")");
+		strcat(TF::gs_szLogMessageBuffer, ")");
 		
-		print(TF::gs_szDebugBuffer);
+		print(TF::gs_szLogMessageBuffer);
 	}
 #endif
 
