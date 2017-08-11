@@ -195,13 +195,6 @@ stock KillTimerHook(iTimer)
 	return false;
 }
 
-stock KillThisTimer()
-{
-	if (gs_iCurrentTimer != -1) {
-		KillTimerHook(gs_iCurrentTimer);
-	}
-}
-
 forward TF::TimerTick();
 public TF::TimerTick()
 {
