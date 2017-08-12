@@ -195,6 +195,55 @@ stock KillTimerHook(iTimer)
 	return false;
 }
 
+/**
+ * <summary>Sets the interval of a timer.</summary>
+ * <param name="timerid">The ID of the timer</param>
+ * <param name="interval">The new interval</param>
+ */
+stock SetTimerInterval(timerid, interval)
+{
+	if (IsValidTimer(timerid) && interval != gs_Timers[timerid][e_iInterval]) {
+		gs_Timers[timerid][e_iInterval] = interval;
+		
+		TF::Debug("(SetTimerInterval) Timer interval has been chanegd for %d (\"%s\").", timerid, gs_Timers[timerid][e_szFunctionName]);
+		
+		return;
+	}
+	
+	TF::Debug("(SetTimerInterval) Failed to set the interval timer %d; not in use / invalid id.", timerid);
+}
+
+/**
+ * <summary>Gets the interval of a timer.</summary>
+ * <param name="timerid">The ID of the timer</param>
+ * <returns>0 for invalid timers, the interval otherwise (in miliseconds)</returns>
+ */
+stock GetTimerInterval(timerid)
+{
+	if (IsValidTimer(timerid)) {
+		return gs_Timers[timerid][e_iInterval];
+	}
+	
+	TF::Debug("(GetTimerInterval) Failed to get the interval timer %d; not in use / invalid id.", timerid);
+	
+	return 0;
+}
+
+/**
+ * <summary>Checks if a timer is still alive.</summary>
+ * <param name="timerid">The ID of the timer</param>
+ * <returns>'true' if the timer is valid, 'false' otherwise</returns>
+ */
+stock bool:IsValidTimer(timerid)
+{
+	if (0 <= timerid < sizeof(gs_Timers)) {
+		if (gs_Timers[timerid][e_bIsUsed]) {
+			return true;
+		}
+	}
+	return false;
+}
+
 forward TF::TimerTick();
 public TF::TimerTick()
 {
