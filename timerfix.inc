@@ -1,7 +1,13 @@
 /*
-	Timerfix v2.0 by Slice
+	Timer Fix v2.0 by Slice
 
 	Changelog:
+			Work in progress:
+				* Added debug messages pretty much everywhere, which was taken from 'SQLite Improved'.
+				* Added SetTimerInterval, GetTimerInterval and bool:IsValidTimer.
+				* The deprecated KillThisTimer is now removed. Simply use KillTimer (which it is KillTimerHook) instead.
+				* The prefix for preprocessors have been changed from TIMER_FIX_* to TF_*.
+
 			2012-02-13:
 				* Improved stability for the beta 2.
 
@@ -38,7 +44,7 @@
 #endif
 
 // "Namespace"
-#define TF::  TF_
+#define TF:: TF_
 
 enum TF::e_TIMER {
 	bool:e_bIsUsed,
@@ -419,6 +425,6 @@ stock TF::GetPublicFunctionAddress(const szName[])
 #endif
 
 // This is done lastly because the fixed function isn't needed within Timerfix
-#define SetTimer    SetTimerHook
-#define SetTimerEx  SetTimerHook
-#define KillTimer   KillTimerHook
+#define SetTimer SetTimerHook
+#define SetTimerEx SetTimerHook
+#define KillTimer KillTimerHook
