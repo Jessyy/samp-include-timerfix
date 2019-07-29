@@ -178,6 +178,11 @@ stock SetTimerHook(const szFunctionName[], iInterval, {bool, _}:bRepeating, cons
 	return iSlot;
 }
 
+/**
+ * <summary>Kills the timer that is specified.</summary>
+ * <param name="iTimer">The ID of the timer</param>
+ * <returns>'true' if the timer was killed, 'false' otherwise</returns>
+ */
 stock KillTimerHook(iTimer)
 {
 	if (0 <= iTimer < sizeof(gs_Timers)) {
@@ -205,12 +210,17 @@ stock SetTimerInterval(timerid, interval)
 	if (IsValidTimer(timerid) && interval != gs_Timers[timerid][e_iInterval]) {
 		gs_Timers[timerid][e_iInterval] = interval;
 		
-		TF::Debug("(SetTimerInterval) Timer interval has been chanegd for %d (\"%s\").", timerid, gs_Timers[timerid][e_szFunctionName]);
+		TF::Debug("(SetTimerInterval) Timer interval has been changed for %d (\"%s\").", timerid, gs_Timers[timerid][e_szFunctionName]);
+		
+		return;
+	}
+	else if (interval == gs_Timers[timerid][e_iInterval]) {
+		TF::Debug("(SetTimerInterval) Failed to set the same interval timer for %d (\"%s\").", timerid, gs_Timers[timerid][e_szFunctionName]);
 		
 		return;
 	}
 	
-	TF::Debug("(SetTimerInterval) Failed to set the interval timer %d; not in use / invalid id.", timerid);
+	TF::Debug("(SetTimerInterval) Failed to set the interval timer %d (not in use / invalid id)", timerid);
 }
 
 /**
@@ -224,7 +234,7 @@ stock GetTimerInterval(timerid)
 		return gs_Timers[timerid][e_iInterval];
 	}
 	
-	TF::Debug("(GetTimerInterval) Failed to get the interval timer %d; not in use / invalid id.", timerid);
+	TF::Debug("(GetTimerInterval) Failed to get the interval timer %d (not in use / invalid id)", timerid);
 	
 	return 0;
 }
@@ -236,10 +246,8 @@ stock GetTimerInterval(timerid)
  */
 stock bool:IsValidTimer(timerid)
 {
-	if (0 <= timerid < sizeof(gs_Timers)) {
-		if (gs_Timers[timerid][e_bIsUsed]) {
-			return true;
-		}
+	if (0 <= timerid < sizeof(gs_Timers) && gs_Timers[timerid][e_bIsUsed]) {
+		return true;
 	}
 	return false;
 }
